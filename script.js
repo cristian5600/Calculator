@@ -44,6 +44,8 @@ Data.prototype.calculate = function(){
         result = divide(parseFloat(this.previousCalculation),parseFloat(this.newInput));
     else alert(`ERROR ~~~~`)
     result = parseFloat(result.toFixed(4));
+    if(result > 9e+7)
+        result = result.toExponential(4);
     this.previousCalculation = `${result}`;
     this.newInput = ``;
     this.operator = ``;
@@ -80,6 +82,7 @@ const operatorFunction = (event) => {
         addToDisplay(event.path[0].innerHTML);
     }
     stopOperatorInput();
+    startKeysInput();
 }
 const keysFunction = (event) => {
 
