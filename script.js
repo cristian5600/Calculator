@@ -3,14 +3,17 @@ const BUTTONS = Array.from(document.getElementsByClassName(`btn key`));
 const OPERATORS = Array.from(document.getElementsByClassName(`opr`));
 const MAX_LENGTH = 9;
 const ACCEPTED = [`-`,`+`,`X`,`/`];
-const EQUAL = Array.from(document.getElementsByClassName(`eql`))
-// get data , get operator , calculate , repeat
-
+const EQUAL = Array.from(document.getElementsByClassName(`eql`));
+const CLEAR = document.getElementsByClassName(`rst`);
 display[0].innerHTML = ``;
 let data = new Data(``,``,``);
+// get data , get operator , calculate , repeat
 
-
-
+function start(){      // starts the calculator
+    startKeysInput();
+    startEqual();
+    startClear();
+}
 
 function resetData(){   // or initial set
     data = new Data(``,``,``);
@@ -40,10 +43,12 @@ Data.prototype.calculate = function(){
     else if(this.operator === `/`)
         result = divide(parseFloat(this.previousCalculation),parseFloat(this.newInput));
     else alert(`ERROR ~~~~`)
+    result = parseFloat(result.toFixed(4));
     this.previousCalculation = `${result}`;
     this.newInput = ``;
     this.operator = ``;
-    return result;
+    return result;//Number.parseFloat(result).toFixed(4);
+    //return result.toFixed(4);
     
 
 }
@@ -55,25 +60,37 @@ function Data(previousCalculation,newInput,operator){
 
 
 const operatorFunction = (event) => {
+    if( data.newInput !== `` && data.previousCalculation !== `` && data.operator !== ``){ // for multiple calculations
+        data.calculate(); 
+    }
     console.log(event.path[0].innerHTML);
     data.addOperator(event.path[0].innerHTML);
+
     if(data.previousCalculation === ``){
         data.previousCalculation = data.newInput;
         data.newInput = ``;
+        addToDisplay(event.path[0].innerHTML);
     }
     else if( data.newInput === ``){
-        console.log(`hello there error`);
+        addToDisplay(event.path[0].innerHTML);
     }
     else{
         data.calculate();
         clearDisplay();
         addToDisplay(event.path[0].innerHTML);
     }
+    stopOperatorInput();
 }
 const keysFunction = (event) => {
+
+    if( (data.previousCalculation !== ``) && (data.operator === `` ) ){
+        console.log(`ENTER OPERATOR`);
+        return
+    }
     console.log(event.path[0].innerHTML);
     addToDisplay(event.path[0].innerHTML);
     data.addDigit(event.path[0].innerHTML);
+
     if(data.newInput.length === 0){
         stopOperatorInput();
     }
@@ -92,9 +109,16 @@ const equalFunction = (event) => {
         return;
     }
     else
-        data.calculate();
+    data.calculate();
     clearDisplay();
     addToDisplay(data.previousCalculation);
+}
+function startClear(){
+    CLEAR[0].addEventListener(`click`, () => {
+        clearDisplay();
+        resetData();
+        stopOperatorInput();
+    })
 }
 function startEqual(){
     EQUAL[0].addEventListener(`click`, equalFunction )
@@ -141,3 +165,5 @@ const divide = function(a,b) {
     return a/b;
       
   };
+
+start();
